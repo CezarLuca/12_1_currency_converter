@@ -28,60 +28,43 @@ function App() {
     }
 
     useEffect(() => {
-        let timeoutId;
-        const fetchConversionRates = () => {
+        async function fetchConversionRates() {
             if (
                 amountToConvert === "" ||
                 fromCurrency === "Please select a currency" ||
                 toCurrency === "Please select a currency"
             ) {
                 return;
+            } else if (fromCurrency === toCurrency) {
+                setConversionResult(amountToConvert);
+                return;
             }
-
-            setIsLoading(true);
-
-            fetch(
-                `https://${hostApi}/latest?amount=${amountToConvert}&from=${fromCurrency}&to=${toCurrency}`
-            )
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    if (data && data.rates && data.rates[toCurrency]) {
-                        setConversionResult(data.rates[toCurrency]);
-                    } else {
-                        throw new Error(
-                            "Currency not found in conversion rates"
-                        );
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching conversion rates", error);
-                    setConversionResult("Error fetching conversion rates");
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                });
-        };
-
-        if (amountToConvert && fromCurrency !== toCurrency) {
-            timeoutId = setTimeout(() => {
-                fetchConversionRates();
-            }, 500);
-        } else {
-            setConversionResult(amountToConvert);
+            try {
+                setIsLoading(true);
+                const response = await fetch(
+                    `https://${hostApi}/latest?amount=${amountToConvert}&from=${fromCurrency}&to=${toCurrency}`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                // console.log(data);
+                if (data && data.rates && data.rates[toCurrency]) {
+                    setConversionResult(data.rates[toCurrency]);
+                } else {
+                    throw new Error("Currency not found in conversion rates");
+                }
+                // setIsLoading(false);
+            } catch (error) {
+                console.error("Error fetching conversion rates", error);
+                setConversionResult("Error fetching conversion rates");
+                // setIsLoading(false);
+            } finally {
+                setIsLoading(false);
+            }
         }
 
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
+        fetchConversionRates();
     }, [amountToConvert, fromCurrency, toCurrency]);
 
     return (
@@ -95,6 +78,7 @@ function App() {
                         placeholder="Enter amount to convert"
                         value={amountToConvert}
                         onChange={handleAmountChange}
+                        // disabled={isLoading}
                     />
                 </span>
                 <span>

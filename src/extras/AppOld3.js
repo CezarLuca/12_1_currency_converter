@@ -37,6 +37,10 @@ function App() {
             ) {
                 return;
             }
+            //  else if (fromCurrency === toCurrency) {
+            //     setConversionResult(amountToConvert);
+            //     return;
+            // }
 
             setIsLoading(true);
 
@@ -82,6 +86,8 @@ function App() {
                 clearTimeout(timeoutId);
             }
         };
+
+        // fetchConversionRates();
     }, [amountToConvert, fromCurrency, toCurrency]);
 
     return (
@@ -95,6 +101,7 @@ function App() {
                         placeholder="Enter amount to convert"
                         value={amountToConvert}
                         onChange={handleAmountChange}
+                        // disabled={isLoading}
                     />
                 </span>
                 <span>
