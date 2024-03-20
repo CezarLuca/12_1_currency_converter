@@ -1,10 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
-    const [amountToConvert, setAmountToConvert] = useState(0);
-    const [fromCurrency, setFromCurrency] = useState("");
-    const [toCurrency, setToCurrency] = useState("");
-    const [conversionResult, setConversionResult] = useState(0);
+    const [amountToConvert, setAmountToConvert] = useState("");
+    const [fromCurrency, setFromCurrency] = useState(
+        "Please select a currency"
+    );
+    const [toCurrency, setToCurrency] = useState("Please select a currency");
+    const [conversionResult, setConversionResult] = useState("");
+
+    const hostApi = "api.frankfurter.app";
+
+    function handleAmountChange(event) {
+        if (isNaN(event.target.value) || event.target.value < 0) {
+            setAmountToConvert(0);
+        } else {
+            setAmountToConvert(event.target.value);
+        }
+    }
+
+    function handleFromCurrencyChange(event) {
+        setFromCurrency(event.target.value);
+    }
+
+    function handleToCurrencyChange(event) {
+        setToCurrency(event.target.value);
+    }
+
+    useEffect(() => {
+        async function fetchConversionRates() {
+            if (
+                amountToConvert === "" ||
+                fromCurrency === "Please select a currency" ||
+                toCurrency === "Please select a currency"
+            ) {
+                return;
+            }
+            try {
+                const response = await fetch(
+                    `https://${hostApi}/latest?amount=${amountToConvert}&from=${fromCurrency}&to=${toCurrency}`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log(data);
+                if (data && data.rates && data.rates[toCurrency]) {
+                    setConversionResult(data.rates[toCurrency]);
+                } else {
+                    throw new Error("Currency not found in conversion rates");
+                }
+            } catch (error) {
+                console.error("Error fetching conversion rates", error);
+            }
+        }
+
+        fetchConversionRates();
+    }, [amountToConvert, fromCurrency, toCurrency]);
 
     return (
         <div className="App">
@@ -12,11 +63,22 @@ function App() {
             <p>
                 <span>
                     <label>Amount</label>
-                    <input type="text" />
+                    <input
+                        type="text"
+                        placeholder="Enter amount to convert"
+                        value={amountToConvert}
+                        onChange={handleAmountChange}
+                    />
                 </span>
                 <span>
                     <label>From</label>
-                    <select>
+                    <select
+                        value={fromCurrency}
+                        onChange={handleFromCurrencyChange}
+                    >
+                        <option value={"Please select a currency"}>
+                            Please select a currency
+                        </option>
                         <option value={"USD"}>USD</option>
                         <option value={"EUR"}>EUR</option>
                         <option value={"CNY"}>CNY</option>
@@ -32,7 +94,13 @@ function App() {
                 </span>
                 <span>
                     <label>To</label>
-                    <select>
+                    <select
+                        value={toCurrency}
+                        onChange={handleToCurrencyChange}
+                    >
+                        <option value={"Please select a currency"}>
+                            Please select a currency
+                        </option>
                         <option value={"USD"}>USD</option>
                         <option value={"EUR"}>EUR</option>
                         <option value={"CNY"}>CNY</option>
@@ -47,14 +115,10 @@ function App() {
                     </select>
                 </span>
             </p>
-            <p>
+            <p className="ConversionResults">
                 <span>
-                    <label>Conversion Result</label>
-                    <input type="text" readOnly />
+                    Conversion Result in {toCurrency}: {conversionResult}
                 </span>
-            </p>
-            <p className="ConvertBtn">
-                <button>Convert</button>
             </p>
         </div>
     );

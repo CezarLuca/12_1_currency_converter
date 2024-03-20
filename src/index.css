@@ -3,10 +3,11 @@ body {
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
+    color: #333; /* Dark grey for general body text */
 }
 
 .App {
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 20px;
     background-color: white;
@@ -14,7 +15,7 @@ body {
 }
 
 h1 {
-    color: #333;
+    color: #007bff; /* Blue for headers */
     text-align: center;
 }
 
@@ -23,11 +24,13 @@ p {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    color: #6c757d; /* Darker grey for paragraph text */
 }
 
 label {
     display: block;
     margin-bottom: 5px;
+    color: #495057; /* Even darker grey for labels */
 }
 
 input[type="text"],
@@ -38,7 +41,17 @@ select {
     border-radius: 5px;
 }
 
-button {
+.ConversionResults {
+    font-size: 1.2em; /* Make the text slightly larger */
+    color: #28a745; /* Use a green color to make it stand out */
+    background-color: #f8f9fa; /* Light grey background */
+    padding: 10px;
+    border-radius: 5px; /* Rounded corners */
+    margin-top: 20px;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+}
+
+/* button {
     background-color: #4caf50;
     color: white;
     padding: 15px 40px;
@@ -57,4 +70,4 @@ button:hover {
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
-}
+} */
